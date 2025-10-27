@@ -1,0 +1,26 @@
+# GitAttributes for Python Rock-Paper-Scissors Game
+# Help GitHub properly detect Python as the primary language
+
+# Python files
+*.py linguist-language=Python
+
+# Main game logic is in Python (even though web version uses PyScript)
+main.py linguist-language=Python
+tests/*.py linguist-language=Python
+
+# Treat HTML with embedded PyScript as containing Python code
+index.html linguist-language=Python
+
+# Standard web assets
+*.css linguist-language=CSS
+*.js linguist-language=JavaScript
+*.html linguist-detectable=true
+
+# Documentation
+*.md linguist-documentation=true
+*.txt linguist-documentation=true
+
+# Configuration files
+netlify.toml linguist-language=TOML
+.gitignore linguist-documentation=true
+.gitattributes linguist-documentation=true

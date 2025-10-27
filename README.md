@@ -1,6 +1,11 @@
-# Rock-Paper-Scissors
+# 🐍 Rock-Paper-Scissors (Pure Python)
 
-A Rock-Paper-Scissors game available in both command-line and web versions.
+![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
+![PyScript](https://img.shields.io/badge/PyScript-enabled-green.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Web](https://img.shields.io/badge/web-ready-brightgreen.svg)
+
+A Rock-Paper-Scissors game powered by **pure Python** - available in both command-line and web versions using PyScript.
 
 ## 🎮 Web Version (Recommended)
 

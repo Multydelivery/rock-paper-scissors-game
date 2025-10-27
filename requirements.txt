@@ -1,0 +1,16 @@
+# Python Rock-Paper-Scissors Game Requirements
+# 
+# For CLI version:
+# No external dependencies required - uses Python standard library only
+#
+# For testing:
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# For optional development tools:
+black>=22.0.0  # Code formatting
+flake8>=5.0.0  # Linting
+
+# For web version:
+# Uses PyScript (loaded via CDN in HTML)
+# No additional Python packages needed for web deployment
