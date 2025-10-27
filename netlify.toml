@@ -1,0 +1,64 @@
+[build]
+  # Directory to serve from
+  publish = "."
+  
+  # No build command needed since it's a static site
+  command = ""
+
+[build.environment]
+  # Specify Node.js version (optional, not needed for this project)
+  NODE_VERSION = "18"
+
+[[headers]]
+  # Apply these headers to all files
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Cache control for static assets
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  # Specific headers for HTML files
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  # Headers for CSS and JS files
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirect rules (optional)
+[[redirects]]
+  from = "/game"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/play"
+  to = "/"
+  status = 301
+
+# SPA fallback (not needed for this simple site, but good to have)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Custom 404 page (optional)
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404

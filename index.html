@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Rock Paper Scissors 🎮</h1>
+            <div class="score">
+                <div class="score-item">
+                    <span class="score-label">You</span>
+                    <span class="score-value" id="player-score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">Computer</span>
+                    <span class="score-value" id="computer-score">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="choices">
+                    <h2>Choose your weapon:</h2>
+                    <div class="choice-buttons">
+                        <button class="choice-btn" data-choice="rock">
+                            <span class="emoji">🪨</span>
+                            <span class="label">Rock</span>
+                        </button>
+                        <button class="choice-btn" data-choice="paper">
+                            <span class="emoji">📄</span>
+                            <span class="label">Paper</span>
+                        </button>
+                        <button class="choice-btn" data-choice="scissors">
+                            <span class="emoji">✂️</span>
+                            <span class="label">Scissors</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="battle-area" id="battle-area" style="display: none;">
+                    <div class="player-choice">
+                        <h3>You chose:</h3>
+                        <div class="choice-display" id="player-display">
+                            <span class="emoji" id="player-emoji"></span>
+                            <span class="label" id="player-label"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="vs">VS</div>
+                    
+                    <div class="computer-choice">
+                        <h3>Computer chose:</h3>
+                        <div class="choice-display" id="computer-display">
+                            <span class="emoji" id="computer-emoji"></span>
+                            <span class="label" id="computer-label"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-area" id="result-area" style="display: none;">
+                    <div class="result-message" id="result-message"></div>
+                    <button class="play-again-btn" id="play-again">Play Again</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button class="reset-btn" id="reset-game">Reset Game</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
