@@ -82,8 +82,9 @@
 
     <py-script>
         import random
-        from pyscript import Element, document
         import asyncio
+        from js import document, console
+        from pyodide.ffi import create_proxy
 
         # Your original Python logic - completely unchanged!
         def normalize_choice(s):
@@ -132,19 +133,19 @@
         game = GameState()
 
         def update_score_display():
-            Element("player-score").write(str(game.player_score))
-            Element("computer-score").write(str(game.computer_score))
+            document.getElementById("player-score").innerHTML = str(game.player_score)
+            document.getElementById("computer-score").innerHTML = str(game.computer_score)
 
         def show_choice(player_type, choice):
             choice_data = game.choices[choice]
             emoji_id = f"{player_type}-emoji"
             label_id = f"{player_type}-label"
             
-            Element(emoji_id).write(choice_data['emoji'])
-            Element(label_id).write(choice_data['label'])
+            document.getElementById(emoji_id).innerHTML = choice_data['emoji']
+            document.getElementById(label_id).innerHTML = choice_data['label']
 
         def show_result(result):
-            Element("result-area").element.style.display = "block"
+            document.getElementById("result-area").style.display = "block"
             
             if result == 'win':
                 message = '🎉 You Win! 🎉'
@@ -158,27 +159,27 @@
                 message = '🤝 It\'s a Draw! 🤝'
                 class_name = 'result-message draw'
             
-            result_elem = Element("result-message")
-            result_elem.write(message)
-            result_elem.element.className = class_name
+            result_elem = document.getElementById("result-message")
+            result_elem.innerHTML = message
+            result_elem.className = class_name
             
             update_score_display()
 
         async def play_game(choice):
             # Disable buttons during game
             for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
-                Element(btn_id).element.disabled = True
+                document.getElementById(btn_id).disabled = True
             
             # Show battle area
-            Element("battle-area").element.style.display = "flex"
-            Element("result-area").element.style.display = "none"
+            document.getElementById("battle-area").style.display = "flex"
+            document.getElementById("result-area").style.display = "none"
             
             # Show player choice immediately
             show_choice('player', choice)
             
             # Show computer "thinking"
-            Element("computer-emoji").write('🤔')
-            Element("computer-label").write('Thinking...')
+            document.getElementById("computer-emoji").innerHTML = '🤔'
+            document.getElementById("computer-label").innerHTML = 'Thinking...'
             
             # Add suspense delay
             await asyncio.sleep(1.5)
@@ -197,20 +198,20 @@
                 show_result(result)
                 
             except ValueError as e:
-                Element("result-message").write(f"Error: {e}")
-                Element("result-area").element.style.display = "block"
+                document.getElementById("result-message").innerHTML = f"Error: {e}"
+                document.getElementById("result-area").style.display = "block"
             
             # Re-enable buttons
             for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
-                Element(btn_id).element.disabled = False
+                document.getElementById(btn_id).disabled = False
 
         def reset_round():
-            Element("battle-area").element.style.display = "none"
-            Element("result-area").element.style.display = "none"
+            document.getElementById("battle-area").style.display = "none"
+            document.getElementById("result-area").style.display = "none"
             
             # Clear previous choices
             for elem_id in ['player-emoji', 'player-label', 'computer-emoji', 'computer-label']:
-                Element(elem_id).write('')
+                document.getElementById(elem_id).innerHTML = ''
 
         def reset_game():
             game.player_score = 0
@@ -237,10 +238,11 @@
             elif key == 'escape':
                 reset_game()
 
-        # Bind keyboard events
-        document.addEventListener('keydown', handle_keydown)
+        # Bind keyboard events  
+        keydown_proxy = create_proxy(handle_keydown)
+        document.addEventListener('keydown', keydown_proxy)
 
-        print("🐍 Pure Python Rock-Paper-Scissors loaded successfully!")
+        console.log("🐍 Pure Python Rock-Paper-Scissors loaded successfully!")
     </py-script>
 </body>
 </html>
