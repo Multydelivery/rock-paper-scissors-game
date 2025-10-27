@@ -30,15 +30,15 @@
                 <div class="choices">
                     <h2>Choose your weapon:</h2>
                     <div class="choice-buttons">
-                        <button class="choice-btn" py-click="play_game('rock')" id="rock-btn">
+                        <button class="choice-btn" onclick="playGameSync('rock')" id="rock-btn">
                             <span class="emoji">🪨</span>
                             <span class="label">Rock</span>
                         </button>
-                        <button class="choice-btn" py-click="play_game('paper')" id="paper-btn">
+                        <button class="choice-btn" onclick="playGameSync('paper')" id="paper-btn">
                             <span class="emoji">📄</span>
                             <span class="label">Paper</span>
                         </button>
-                        <button class="choice-btn" py-click="play_game('scissors')" id="scissors-btn">
+                        <button class="choice-btn" onclick="playGameSync('scissors')" id="scissors-btn">
                             <span class="emoji">✂️</span>
                             <span class="label">Scissors</span>
                         </button>
@@ -67,13 +67,13 @@
 
                 <div class="result-area" id="result-area" style="display: none;">
                     <div class="result-message" id="result-message"></div>
-                    <button class="play-again-btn" py-click="reset_round()" id="play-again">Play Again</button>
+                    <button class="play-again-btn" onclick="resetRound()" id="play-again">Play Again</button>
                 </div>
             </div>
         </main>
 
         <footer>
-            <button class="reset-btn" py-click="reset_game()" id="reset-game">Reset Game</button>
+            <button class="reset-btn" onclick="resetGame()" id="reset-game">Reset Game</button>
             <div class="loading-indicator" id="loading" style="display: none;">
                 <span>🐍 Loading Python...</span>
             </div>
@@ -82,8 +82,7 @@
 
     <py-script>
         import random
-        import asyncio
-        from js import document, console
+        from js import document, console, setTimeout, window
         from pyodide.ffi import create_proxy
 
         # Your original Python logic - completely unchanged!
@@ -165,7 +164,7 @@
             
             update_score_display()
 
-        async def play_game(choice):
+        def play_game_sync(choice):
             # Disable buttons during game
             for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
                 document.getElementById(btn_id).disabled = True
@@ -177,33 +176,32 @@
             # Show player choice immediately
             show_choice('player', choice)
             
-            # Show computer "thinking"
+            # Show computer "thinking" briefly
             document.getElementById("computer-emoji").innerHTML = '🤔'
             document.getElementById("computer-label").innerHTML = 'Thinking...'
             
-            # Add suspense delay
-            await asyncio.sleep(1.5)
+            # Use setTimeout for a brief delay
+            def delayed_result():
+                try:
+                    player_choice, computer_choice, result = play_round(choice)
+                    
+                    # Show computer choice
+                    show_choice('computer', computer_choice)
+                    
+                    # Show result
+                    show_result(result)
+                    
+                except ValueError as e:
+                    document.getElementById("result-message").innerHTML = f"Error: {e}"
+                    document.getElementById("result-area").style.display = "block"
+                
+                # Re-enable buttons
+                for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
+                    document.getElementById(btn_id).disabled = False
             
-            # Play the round using original Python logic
-            try:
-                player_choice, computer_choice, result = play_round(choice)
-                
-                # Show computer choice
-                show_choice('computer', computer_choice)
-                
-                # Wait a bit more for effect
-                await asyncio.sleep(0.5)
-                
-                # Show result
-                show_result(result)
-                
-            except ValueError as e:
-                document.getElementById("result-message").innerHTML = f"Error: {e}"
-                document.getElementById("result-area").style.display = "block"
-            
-            # Re-enable buttons
-            for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
-                document.getElementById(btn_id).disabled = False
+            # Add small delay for effect
+            from js import setTimeout
+            setTimeout(create_proxy(delayed_result), 800)
 
         def reset_round():
             document.getElementById("battle-area").style.display = "none"
@@ -222,6 +220,12 @@
         # Initialize display
         update_score_display()
 
+        # Expose functions to global scope for onclick handlers
+        from js import window
+        window.playGameSync = create_proxy(play_game_sync)
+        window.resetRound = create_proxy(reset_round)
+        window.resetGame = create_proxy(reset_game)
+
         # Add keyboard shortcuts
         def handle_keydown(event):
             key_map = {
@@ -233,8 +237,7 @@
             key = event.key.lower()
             if key in key_map:
                 choice = key_map[key]
-                # Create a task to run the async function
-                asyncio.create_task(play_game(choice))
+                play_game_sync(choice)
             elif key == 'escape':
                 reset_game()
 
