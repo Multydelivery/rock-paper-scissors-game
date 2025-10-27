@@ -35,10 +35,40 @@ python -m pip install pytest
 pytest -q
 ```
 
-## Files Structure
+## 🚀 Deploy to GitHub & Netlify
+
+### Step 1: Push to GitHub
+1. Create a new repository on [GitHub](https://github.com/new)
+2. Copy the remote URL (e.g., `https://github.com/yourusername/rock-paper-scissors.git`)
+3. Connect your local repository:
+   ```bash
+   git remote add origin https://github.com/yourusername/rock-paper-scissors.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+### Step 2: Deploy on Netlify
+1. Go to [Netlify](https://netlify.com) and sign up/login
+2. Click "New site from Git"
+3. Choose GitHub and select your repository
+4. Deploy settings (auto-detected from `netlify.toml`):
+   - **Build command:** (leave empty)
+   - **Publish directory:** (leave empty, defaults to root)
+5. Click "Deploy site"
+
+Your site will be live at `https://amazing-name-123456.netlify.app`
+
+### Step 3: Custom Domain (Optional)
+1. In Netlify dashboard, go to "Domain settings"
+2. Add your custom domain
+3. Follow DNS configuration instructions
+
+## 📁 Files Structure
 
 - `index.html` - Web version HTML structure
-- `style.css` - Styling and animations for web version
+- `style.css` - Styling and animations for web version  
 - `script.js` - Game logic and interactions for web version
 - `main.py` - Command-line version and core game logic
 - `tests/test_rps.py` - Unit tests for the game logic
+- `netlify.toml` - Netlify deployment configuration
+- `.gitignore` - Git ignore rules

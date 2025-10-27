@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors</title>
+    <title>Rock Paper Scissors - Pure Python</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎮 Rock Paper Scissors 🎮</h1>
+            <p class="python-badge">🐍 Powered by Pure Python</p>
             <div class="score">
                 <div class="score-item">
                     <span class="score-label">You</span>
@@ -27,15 +30,15 @@
                 <div class="choices">
                     <h2>Choose your weapon:</h2>
                     <div class="choice-buttons">
-                        <button class="choice-btn" data-choice="rock">
+                        <button class="choice-btn" py-click="play_game('rock')" id="rock-btn">
                             <span class="emoji">🪨</span>
                             <span class="label">Rock</span>
                         </button>
-                        <button class="choice-btn" data-choice="paper">
+                        <button class="choice-btn" py-click="play_game('paper')" id="paper-btn">
                             <span class="emoji">📄</span>
                             <span class="label">Paper</span>
                         </button>
-                        <button class="choice-btn" data-choice="scissors">
+                        <button class="choice-btn" py-click="play_game('scissors')" id="scissors-btn">
                             <span class="emoji">✂️</span>
                             <span class="label">Scissors</span>
                         </button>
@@ -64,16 +67,180 @@
 
                 <div class="result-area" id="result-area" style="display: none;">
                     <div class="result-message" id="result-message"></div>
-                    <button class="play-again-btn" id="play-again">Play Again</button>
+                    <button class="play-again-btn" py-click="reset_round()" id="play-again">Play Again</button>
                 </div>
             </div>
         </main>
 
         <footer>
-            <button class="reset-btn" id="reset-game">Reset Game</button>
+            <button class="reset-btn" py-click="reset_game()" id="reset-game">Reset Game</button>
+            <div class="loading-indicator" id="loading" style="display: none;">
+                <span>🐍 Loading Python...</span>
+            </div>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <py-script>
+        import random
+        from pyscript import Element, document
+        import asyncio
+
+        # Your original Python logic - completely unchanged!
+        def normalize_choice(s):
+            s = s.strip().lower()
+            if s.startswith('r'):
+                return 'rock'
+            if s.startswith('p'):
+                return 'paper'
+            if s.startswith('s'):
+                return 'scissors'
+            raise ValueError(f"Invalid choice: {s}")
+
+        def random_choice():
+            return random.choice(['rock', 'paper', 'scissors'])
+
+        def decide(player, computer):
+            """Decide winner. Returns one of: 'win', 'lose', 'draw'."""
+            if player == computer:
+                return 'draw'
+            wins = {
+                ('rock', 'scissors'),
+                ('scissors', 'paper'),
+                ('paper', 'rock'),
+            }
+            return 'win' if (player, computer) in wins else 'lose'
+
+        def play_round(player_input):
+            """Play one round given raw player input.
+            Returns tuple (player_choice, computer_choice, result)"""
+            player = normalize_choice(player_input)
+            comp = random_choice()
+            result = decide(player, comp)
+            return player, comp, result
+
+        # Game state
+        class GameState:
+            def __init__(self):
+                self.player_score = 0
+                self.computer_score = 0
+                self.choices = {
+                    'rock': {'emoji': '🪨', 'label': 'Rock'},
+                    'paper': {'emoji': '📄', 'label': 'Paper'},
+                    'scissors': {'emoji': '✂️', 'label': 'Scissors'}
+                }
+
+        game = GameState()
+
+        def update_score_display():
+            Element("player-score").write(str(game.player_score))
+            Element("computer-score").write(str(game.computer_score))
+
+        def show_choice(player_type, choice):
+            choice_data = game.choices[choice]
+            emoji_id = f"{player_type}-emoji"
+            label_id = f"{player_type}-label"
+            
+            Element(emoji_id).write(choice_data['emoji'])
+            Element(label_id).write(choice_data['label'])
+
+        def show_result(result):
+            Element("result-area").element.style.display = "block"
+            
+            if result == 'win':
+                message = '🎉 You Win! 🎉'
+                class_name = 'result-message win'
+                game.player_score += 1
+            elif result == 'lose':
+                message = '💻 Computer Wins! 💻'
+                class_name = 'result-message lose'
+                game.computer_score += 1
+            else:
+                message = '🤝 It\'s a Draw! 🤝'
+                class_name = 'result-message draw'
+            
+            result_elem = Element("result-message")
+            result_elem.write(message)
+            result_elem.element.className = class_name
+            
+            update_score_display()
+
+        async def play_game(choice):
+            # Disable buttons during game
+            for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
+                Element(btn_id).element.disabled = True
+            
+            # Show battle area
+            Element("battle-area").element.style.display = "flex"
+            Element("result-area").element.style.display = "none"
+            
+            # Show player choice immediately
+            show_choice('player', choice)
+            
+            # Show computer "thinking"
+            Element("computer-emoji").write('🤔')
+            Element("computer-label").write('Thinking...')
+            
+            # Add suspense delay
+            await asyncio.sleep(1.5)
+            
+            # Play the round using original Python logic
+            try:
+                player_choice, computer_choice, result = play_round(choice)
+                
+                # Show computer choice
+                show_choice('computer', computer_choice)
+                
+                # Wait a bit more for effect
+                await asyncio.sleep(0.5)
+                
+                # Show result
+                show_result(result)
+                
+            except ValueError as e:
+                Element("result-message").write(f"Error: {e}")
+                Element("result-area").element.style.display = "block"
+            
+            # Re-enable buttons
+            for btn_id in ['rock-btn', 'paper-btn', 'scissors-btn']:
+                Element(btn_id).element.disabled = False
+
+        def reset_round():
+            Element("battle-area").element.style.display = "none"
+            Element("result-area").element.style.display = "none"
+            
+            # Clear previous choices
+            for elem_id in ['player-emoji', 'player-label', 'computer-emoji', 'computer-label']:
+                Element(elem_id).write('')
+
+        def reset_game():
+            game.player_score = 0
+            game.computer_score = 0
+            update_score_display()
+            reset_round()
+
+        # Initialize display
+        update_score_display()
+
+        # Add keyboard shortcuts
+        def handle_keydown(event):
+            key_map = {
+                'r': 'rock',
+                'p': 'paper', 
+                's': 'scissors'
+            }
+            
+            key = event.key.lower()
+            if key in key_map:
+                choice = key_map[key]
+                # Create a task to run the async function
+                asyncio.create_task(play_game(choice))
+            elif key == 'escape':
+                reset_game()
+
+        # Bind keyboard events
+        document.addEventListener('keydown', handle_keydown)
+
+        print("🐍 Pure Python Rock-Paper-Scissors loaded successfully!")
+    </py-script>
 </body>
 </html>
